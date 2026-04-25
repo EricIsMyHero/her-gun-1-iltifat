@@ -1,51 +1,806 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hər gün 1 iltifat</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hər gün 1 iltifat</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  min-height:100vh;
+  background:#0a0a12;
+  font-family:'DM Sans',sans-serif;
+  color:#e8e0f0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+  position:relative;
+}
+
+.bg-mesh{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(180,60,120,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(100,40,160,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 60% 10%, rgba(60,20,100,0.12) 0%, transparent 60%),
+    #0a0a12;
+  pointer-events:none;
+}
+
+.noise{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  opacity:0.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+
+.container{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:520px;
+  padding:40px 24px 60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.eyebrow{
+  font-size:11px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:rgba(220,150,190,0.55);
+  font-weight:400;
+  margin-bottom:14px;
+  animation:fadeUp 0.8s ease both;
+}
+
+.title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(34px,8vw,52px);
+  font-weight:300;
+  line-height:1.12;
+  text-align:center;
+  color:#f0e6f8;
+  letter-spacing:-0.01em;
+  margin-bottom:6px;
+  animation:fadeUp 0.9s 0.1s ease both;
+}
+
+.title em{
+  font-style:italic;
+  font-weight:300;
+  color:#d48ab0;
+}
+
+.subtitle{
+  font-size:13px;
+  color:rgba(200,170,220,0.45);
+  margin-bottom:40px;
+  animation:fadeUp 0.9s 0.2s ease both;
+}
+
+.stats-row{
+  display:flex;
+  gap:12px;
+  width:100%;
+  margin-bottom:28px;
+  animation:fadeUp 0.9s 0.3s ease both;
+}
+
+.stat-pill{
+  flex:1;
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.09);
+  border-radius:12px;
+  padding:12px 14px;
+  text-align:center;
+}
+
+.stat-label{
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(200,170,220,0.4);
+  margin-bottom:4px;
+}
+
+.stat-value{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  font-weight:300;
+  color:#e8d0f0;
+}
+
+.stat-value span{
+  font-size:13px;
+  color:rgba(200,150,200,0.5);
+  font-family:'DM Sans',sans-serif;
+}
+
+.card{
+  width:100%;
+  background:rgba(255,255,255,0.035);
+  border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:36px 32px 28px;
+  position:relative;
+  overflow:hidden;
+  animation:fadeUp 0.9s 0.4s ease both;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, rgba(180,60,120,0.06) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+.card-accent{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(200,80,140,0.4), transparent);
+}
+
+.compliment-number{
+  font-size:11px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:rgba(200,120,170,0.45);
+  margin-bottom:16px;
+}
+
+.compliment-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(19px,4vw,24px);
+  font-weight:300;
+  font-style:italic;
+  line-height:1.65;
+  color:#f0e4f8;
+  min-height:90px;
+  letter-spacing:0.01em;
+}
+
+.cursor{
+  display:inline-block;
+  width:2px;
+  height:1.1em;
+  background:#d48ab0;
+  margin-left:2px;
+  vertical-align:text-bottom;
+  animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.card-footer{
+  margin-top:24px;
+  padding-top:20px;
+  border-top:0.5px solid rgba(255,255,255,0.07);
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  flex:1;
+  min-width:100px;
+  padding:11px 16px;
+  border-radius:10px;
+  border:0.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);
+  color:rgba(220,180,240,0.8);
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  font-weight:400;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-align:center;
+  letter-spacing:0.02em;
+}
+
+.btn:hover{
+  background:rgba(180,60,120,0.15);
+  border-color:rgba(180,60,120,0.3);
+  color:#f0d0e8;
+  transform:translateY(-1px);
+}
+
+.btn:active{transform:scale(0.97)}
+
+.btn-primary{
+  background:rgba(180,60,120,0.2);
+  border-color:rgba(180,60,120,0.35);
+  color:#f0c0d8;
+}
+
+.btn-primary:hover{
+  background:rgba(180,60,120,0.32);
+  border-color:rgba(200,80,140,0.5);
+}
+
+.toast{
+  position:fixed;
+  top:24px;left:50%;
+  transform:translateX(-50%) translateY(-12px);
+  background:rgba(30,12,40,0.92);
+  border:0.5px solid rgba(200,100,160,0.3);
+  color:#e8d0f0;
+  padding:10px 22px;
+  border-radius:40px;
+  font-size:13px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  opacity:0;
+  transition:all 0.3s;
+  z-index:100;
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.progress-section{
+  width:100%;
+  margin-top:24px;
+  animation:fadeUp 0.9s 0.5s ease both;
+}
+
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:rgba(200,150,200,0.4);
+  letter-spacing:0.08em;
+  margin-bottom:8px;
+}
+
+.progress-track{
+  width:100%;
+  height:3px;
+  background:rgba(255,255,255,0.06);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg, #8a3060, #c2185b, #e060a0);
+  border-radius:2px;
+  transition:width 1s linear;
+  width:0%;
+}
+
+.countdown{
+  text-align:center;
+  font-size:12px;
+  color:rgba(180,120,170,0.4);
+  margin-top:10px;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.04em;
+}
+
+.streak-badge{
+  display:none;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  background:rgba(255,180,50,0.08);
+  border:0.5px solid rgba(255,180,50,0.2);
+  border-radius:40px;
+  font-size:12px;
+  color:rgba(255,200,80,0.7);
+  margin-top:16px;
+  font-weight:400;
+}
+
+.streak-fire{font-size:14px}
+
+.favorite-btn{
+  position:absolute;
+  top:16px;right:16px;
+  width:32px;height:32px;
+  border-radius:50%;
+  border:0.5px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.04);
+  color:rgba(200,120,170,0.5);
+  font-size:15px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+  line-height:1;
+}
+
+.favorite-btn:hover{
+  background:rgba(200,50,100,0.15);
+  border-color:rgba(200,50,100,0.3);
+}
+
+.favorite-btn.active{
+  color:#e05090;
+  background:rgba(200,50,100,0.18);
+  border-color:rgba(200,50,100,0.35);
+}
+
+.error-msg{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  font-style:italic;
+  color:rgba(220,100,130,0.7);
+}
+
+footer{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:0 24px 32px;
+  font-size:12px;
+  color:rgba(180,140,200,0.28);
+  letter-spacing:0.04em;
+}
+
+footer a{
+  color:rgba(200,100,150,0.45);
+  text-decoration:none;
+}
+
+footer a:hover{
+  color:rgba(220,130,170,0.7);
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.floating-emojis{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+
+.fem{
+  position:absolute;
+  opacity:0.06;
+  animation:floatEm 14s infinite ease-in-out;
+  user-select:none;
+  font-style:normal;
+}
+
+@keyframes floatEm{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-28px) rotate(5deg)}
+}
+
+/* Panel (iltifat əlavə etmə) */
+#floatingBtn{
+  position:fixed;
+  bottom:24px;right:24px;
+  z-index:200;
+  background:rgba(180,60,120,0.25);
+  border:0.5px solid rgba(200,80,140,0.35);
+  color:#f0c0d8;
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  padding:10px 18px;
+  border-radius:40px;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  transition:all 0.2s;
+}
+
+#floatingBtn:hover{
+  background:rgba(180,60,120,0.4);
+  transform:translateY(-1px);
+}
+
+#panel{
+  position:fixed;
+  bottom:72px;right:20px;
+  width:min(340px, calc(100vw - 40px));
+  background:rgba(18,8,28,0.94);
+  border:0.5px solid rgba(200,100,160,0.2);
+  border-radius:16px;
+  padding:20px;
+  display:none;
+  z-index:199;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+
+#panel h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;
+  font-weight:300;
+  color:#f0e4f8;
+  margin-bottom:14px;
+}
+
+#panel textarea{
+  width:100%;
+  height:80px;
+  padding:10px 12px;
+  font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  border-radius:10px;
+  border:0.5px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#e8e0f0;
+  resize:none;
+  margin-bottom:12px;
+  box-sizing:border-box;
+  outline:none;
+}
+
+#panel textarea:focus{
+  border-color:rgba(200,80,140,0.4);
+}
+
+#panel textarea::placeholder{color:rgba(200,150,200,0.35)}
+
+.panel-btns{
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+}
+
+.panel-btns button{
+  flex:1;
+  padding:9px 12px;
+  border-radius:8px;
+  border:0.5px solid rgba(255,255,255,0.1);
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.panel-btns .add-btn{
+  background:rgba(56,142,60,0.2);
+  border-color:rgba(56,142,60,0.3);
+  color:rgba(160,230,160,0.8);
+}
+
+.panel-btns .clear-btn{
+  background:rgba(198,40,40,0.15);
+  border-color:rgba(198,40,40,0.25);
+  color:rgba(240,150,150,0.7);
+}
+
+#panel h4{
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(200,150,200,0.4);
+  margin-bottom:10px;
+  font-weight:400;
+}
+
+#panel hr{
+  border:none;
+  border-top:0.5px solid rgba(255,255,255,0.07);
+  margin:14px 0;
+}
+
+#complimentList{
+  list-style:none;
+  max-height:140px;
+  overflow-y:auto;
+  padding:0;
+}
+
+#complimentList li{
+  font-size:13px;
+  color:rgba(220,180,240,0.6);
+  padding:6px 0;
+  border-bottom:0.5px solid rgba(255,255,255,0.05);
+  line-height:1.4;
+}
+
+#complimentList li:last-child{border-bottom:none}
+</style>
 </head>
 <body>
 
-  <div id="floatingBtn" onclick="togglePanel()">➕ İltifat</div>
+<div class="bg-mesh"></div>
+<div class="noise"></div>
+<div class="floating-emojis" id="floatingEmojis"></div>
+<div class="toast" id="toast"></div>
 
-  <div id="panel">
-    <h3>İltifat əlavə et 💬</h3>
-    <textarea id="newCompliment" placeholder="İltifatlarınızın bu saytda paylaşılması üçün instaya yazın."></textarea>
-    <button onclick="addCompliment()" style="background:#388E3C;">➕ Əlavə et</button>
-    <button onclick="clearAllCompliments()" style="background:#C62828;">🧹 Hamısını sil</button>
-    <hr>
-    <h4>Əlavə olunanlar (Sadəcə sənə görünür):</h4>
-    <ul id="complimentList"></ul>
+<button id="floatingBtn" onclick="togglePanel()">➕ İltifat əlavə et</button>
+
+<div id="panel">
+  <h3>İltifat əlavə et 💬</h3>
+  <textarea id="newCompliment" placeholder="İltifatlarınızın bu saytda paylaşılması üçün instaya yazın."></textarea>
+  <div class="panel-btns">
+    <button class="add-btn" onclick="addCompliment()">➕ Əlavə et</button>
+    <button class="clear-btn" onclick="clearAllCompliments()">🧹 Hamısını sil</button>
   </div>
+  <hr>
+  <h4>Əlavə olunanlar (Sadəcə sənə görünür)</h4>
+  <ul id="complimentList"></ul>
+</div>
 
-  <div style="margin: 40px 0;">
-    <label for="timer" style="font-weight: bold; display: block; margin-bottom: 10px;">
-      Növbəti iltifata qədərki vaxt:
-    </label>
-    <div id="progress-container">
-      <div id="progress"></div>
+<div class="container">
+  <p class="eyebrow">Hər gün bir iltifat</p>
+  <h1 class="title">Sənin üçün <em>seçildi</em></h1>
+  <p class="subtitle" id="dayCount">Yüklənir...</p>
+
+  <div class="stats-row">
+    <div class="stat-pill">
+      <div class="stat-label">Gün</div>
+      <div class="stat-value" id="dayNum">—</div>
     </div>
-    <div id="countdown"></div>
+    <div class="stat-pill">
+      <div class="stat-label">İltifat</div>
+      <div class="stat-value" id="complimentNum">—</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Streak</div>
+      <div class="stat-value" id="streakNum">—<span> gün</span></div>
+    </div>
   </div>
 
-  <h1>💖 Hər gün 1 iltifat 💝</h1>
-  <div class="info" id="dayCount">Gün yüklənir...</div>
-  <div class="info" id="complimentNumber"></div>
-  <div class="compliment" id="compliment">İltifat yüklənir...</div>
-
-  <div class="share-button">
-    <button onclick="shareSite()">💌 Saytı paylaş</button>
+  <div class="card">
+    <div class="card-accent"></div>
+    <button class="favorite-btn" id="favBtn" title="Sevimlilərə əlavə et">♡</button>
+    <p class="compliment-number" id="complimentNumber">Yüklənir...</p>
+    <p class="compliment-text" id="compliment"><span class="cursor"></span></p>
+    <div class="card-footer">
+      <button class="btn btn-primary" onclick="copyCompliment()">Kopyala</button>
+      <button class="btn" onclick="shareCompliment()">Paylaş</button>
+      <button class="btn" onclick="shareWhatsApp()">WhatsApp</button>
+    </div>
   </div>
 
-  <footer>
-    <p>&copy; 2025 - 2026 Ali Production 💖 |
-    <a href="https://ericismyhero.github.io/my-portfolio/">Əlaqə</a> |
-    <a href="mailto:ericismyhero2467@gmail.com">Təklif və İradlarınız üçün</a> </p>
-  </footer>
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>Günün irəliləyişi</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="countdown" id="countdown">Hesablanır...</p>
+  </div>
 
-  <script src="script.js"></script>
+  <div id="streakBadge" class="streak-badge">
+    <span class="streak-fire">🔥</span>
+    <span id="streakText">2 gün ardıcıl</span>
+  </div>
+</div>
 
+<footer>
+  <p>&copy; 2025–2026 Ali Production &nbsp;·&nbsp;
+  <a href="https://ericismyhero.github.io/my-portfolio/">Əlaqə</a> &nbsp;·&nbsp;
+  <a href="mailto:ericismyhero2467@gmail.com">Təklif və İradlarınız üçün</a></p>
+</footer>
+
+<script>
+let COMPLIMENTS = [];
+let currentIdx = 0;
+
+function typeText(el, text, speed) {
+  speed = speed || 28;
+  el.innerHTML = '';
+  var cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  var i = 0;
+  function tick() {
+    if (i < text.length) {
+      el.textContent = text.slice(0, ++i);
+      el.appendChild(cursor);
+      setTimeout(tick, speed + Math.random() * 18);
+    } else {
+      setTimeout(function(){ cursor.remove(); }, 900);
+    }
+  }
+  tick();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+function initPage(compliments) {
+  COMPLIMENTS = compliments;
+
+  var today = new Date();
+  var day = today.getDate();
+  var month = today.toLocaleString('az-AZ', { month: 'long' });
+  var year = today.getFullYear();
+  var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  currentIdx = (day - 1) % COMPLIMENTS.length;
+
+  document.getElementById('dayCount').textContent = day + ' ' + month + ' ' + year;
+  document.getElementById('dayNum').textContent = dayOfYear;
+  document.getElementById('complimentNum').innerHTML = (currentIdx + 1) + '<span>/' + COMPLIMENTS.length + '</span>';
+  document.getElementById('complimentNumber').textContent = 'İltifat №' + (currentIdx + 1);
+
+  setTimeout(function(){
+    typeText(document.getElementById('compliment'), COMPLIMENTS[currentIdx]);
+  }, 300);
+
+  // Streak
+  var todayStr = today.toDateString();
+  var last = localStorage.getItem('lastVisit');
+  var streak = parseInt(localStorage.getItem('streak') || '0');
+  if (last === todayStr) {
+    // eyni gün
+  } else if (last === new Date(today - 86400000).toDateString()) {
+    streak++;
+    localStorage.setItem('streak', streak);
+  } else {
+    streak = 1;
+    localStorage.setItem('streak', streak);
+  }
+  localStorage.setItem('lastVisit', todayStr);
+  document.getElementById('streakNum').innerHTML = streak + '<span> gün</span>';
+  if (streak >= 2) {
+    var badge = document.getElementById('streakBadge');
+    badge.style.display = 'inline-flex';
+    document.getElementById('streakText').textContent = streak + ' gün ardıcıl';
+  }
+
+  // Sevimli
+  var favs = JSON.parse(localStorage.getItem('favCompliments') || '[]');
+  var favBtn = document.getElementById('favBtn');
+  if (favs.includes(COMPLIMENTS[currentIdx])) {
+    favBtn.textContent = '♥';
+    favBtn.classList.add('active');
+  }
+
+  // Panel - mövcud iltifatlar
+  var customList = JSON.parse(localStorage.getItem('customCompliments') || '[]');
+  var list = document.getElementById('complimentList');
+  customList.forEach(function(text){
+    var li = document.createElement('li');
+    li.textContent = text;
+    list.appendChild(li);
+  });
+}
+
+// iltifatlar.json-dan yüklə
+fetch('iltifatlar.json')
+  .then(function(res){ return res.json(); })
+  .then(function(data){ initPage(data); })
+  .catch(function(err){
+    console.error('Xəta:', err);
+    document.getElementById('compliment').innerHTML = '<span class="error-msg">İltifatlar yüklənə bilmədi 😢</span>';
+    document.getElementById('complimentNumber').textContent = 'Xəta';
+    document.getElementById('dayCount').textContent = new Date().toLocaleDateString('az-AZ');
+  });
+
+// Progress bar
+function updateProgress() {
+  var now = new Date();
+  var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  var pct = Math.min(((now - start) / (end - start)) * 100, 100);
+  var rem = end - now;
+  var h = Math.floor(rem / 3600000);
+  var m = Math.floor((rem % 3600000) / 60000);
+  var s = Math.floor((rem % 60000) / 1000);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct.toFixed(1) + '%';
+  document.getElementById('countdown').textContent =
+    'Yeni iltifata ' + h + ' saat ' + m + ' dəq ' + s + ' san qaldı';
+}
+updateProgress();
+setInterval(updateProgress, 1000);
+
+// Sevimli düyməsi
+document.getElementById('favBtn').addEventListener('click', function(){
+  if (!COMPLIMENTS.length) return;
+  var isFav = this.classList.contains('active');
+  isFav = !isFav;
+  this.textContent = isFav ? '♥' : '♡';
+  this.classList.toggle('active', isFav);
+  showToast(isFav ? 'Sevimlilərə əlavə edildi 💖' : 'Sevimlilərdən çıxarıldı');
+  var favs = JSON.parse(localStorage.getItem('favCompliments') || '[]');
+  var curr = COMPLIMENTS[currentIdx];
+  if (isFav) {
+    if (!favs.includes(curr)) { favs.push(curr); }
+  } else {
+    favs = favs.filter(function(f){ return f !== curr; });
+  }
+  localStorage.setItem('favCompliments', JSON.stringify(favs));
+});
+
+// Düymələr
+function copyCompliment() {
+  if (!COMPLIMENTS.length) return;
+  navigator.clipboard.writeText(COMPLIMENTS[currentIdx])
+    .then(function(){ showToast('Kopyalandı ✓'); })
+    .catch(function(){ showToast('Kopyalana bilmədi'); });
+}
+
+function shareCompliment() {
+  var data = {
+    title: 'Hər gün 1 iltifat',
+    text: COMPLIMENTS[currentIdx] || '',
+    url: window.location.href
+  };
+  if (navigator.share) {
+    navigator.share(data).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(window.location.href);
+    showToast('Link kopyalandı!');
+  }
+}
+
+function shareWhatsApp() {
+  var text = encodeURIComponent((COMPLIMENTS[currentIdx] || '') + '\n\n' + window.location.href);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+// Panel
+function togglePanel() {
+  var panel = document.getElementById('panel');
+  panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+}
+
+function addCompliment() {
+  var input = document.getElementById('newCompliment');
+  var value = input.value.trim();
+  if (value) {
+    var compliments = JSON.parse(localStorage.getItem('customCompliments') || '[]');
+    compliments.push(value);
+    localStorage.setItem('customCompliments', JSON.stringify(compliments));
+    var li = document.createElement('li');
+    li.textContent = value;
+    document.getElementById('complimentList').appendChild(li);
+    input.value = '';
+    showToast('Əlavə edildi ✓');
+  } else {
+    showToast('Boş göndərmə 🙃');
+  }
+}
+
+function clearAllCompliments() {
+  if (confirm('Əminsən? Bütün əlavə etdiyin iltifatlar silinəcək!')) {
+    localStorage.removeItem('customCompliments');
+    document.getElementById('complimentList').innerHTML = '';
+    showToast('Silindi ✓');
+  }
+}
+
+// Floating emojilər
+var ems = ['🌸','🎀','🩷','💝','💖','✨','🌷','🫶'];
+var fec = document.getElementById('floatingEmojis');
+for (var i = 0; i < 18; i++) {
+  var d = document.createElement('div');
+  d.className = 'fem';
+  d.textContent = ems[Math.floor(Math.random() * ems.length)];
+  d.style.left = Math.random() * 100 + 'vw';
+  d.style.top = Math.random() * 100 + 'vh';
+  d.style.fontSize = (14 + Math.random() * 16) + 'px';
+  d.style.animationDelay = (Math.random() * 12) + 's';
+  d.style.animationDuration = (10 + Math.random() * 8) + 's';
+  fec.appendChild(d);
+}
+</script>
 </body>
 </html>
